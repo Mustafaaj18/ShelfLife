@@ -1,6 +1,6 @@
 
 
-<img width="1536" height="1024" alt="Shelf Life Library Logo" src="https://github.com/user-attachments/assets/fbb08ecc-85b0-402a-961d-d261b145a95b" />
+<img width="1536" height="1024" alt="Bookshelf Life Library Logo" src="https://github.com/user-attachments/assets/d673e1cf-5f9b-4636-aa92-8c5f0ff3a785" />
 
 
 # 📚 Shelf Life
