@@ -220,3 +220,106 @@ nav button:hover {
     font-size: 14px;
   }
 }
+
+
+/* Book Management */
+
+.book-management {
+  max-width: 1100px;
+  min-height: 70vh;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.book-management h1 {
+  color: #172b4d;
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.book-management > p {
+  margin-bottom: 30px;
+}
+
+.book-management > input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 30px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.book-management section {
+  background-color: #fff;
+  padding: 30px;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+}
+
+.book-management h2 {
+  color: #172b4d;
+  margin-bottom: 20px;
+}
+
+.book-management form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.book-management label {
+  font-weight: 600;
+  color: #172b4d;
+}
+
+.book-management form input:not([type="checkbox"]) {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.book-management button {
+  padding: 10px 16px;
+  margin: 4px;
+  background-color: #172b4d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.book-management button:hover {
+  background-color: #29466e;
+}
+
+.book-management table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.book-management th,
+.book-management td {
+  padding: 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+.book-management th {
+  background-color: #f5f1e8;
+  color: #172b4d;
+}
+
+@media (max-width: 600px) {
+  .book-management {
+    padding: 30px 16px;
+  }
+
+  .book-management section {
+    padding: 16px;
+  }
+}

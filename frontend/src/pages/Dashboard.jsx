@@ -1,6 +1,14 @@
 
 function Dashboard({ role }) {
   const isAdmin = role === 'admin'
+  if (!role) {
+  return (
+    <main className="dashboard">
+      <h1>Library Dashboard</h1>
+      <p>Please sign in to access your dashboard.</p>
+    </main>
+  )
+}
 
   return (
     <main className="dashboard">

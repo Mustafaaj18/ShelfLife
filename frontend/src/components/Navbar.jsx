@@ -14,6 +14,9 @@ function Navbar({ onNavigate }) {
       <button type="button" onClick={() => onNavigate('signin')}>
         Sign In
       </button>
+      <button type="button" onClick={() => onNavigate('books')}>
+        Books
+      </button>
     </nav>
   )
 }
