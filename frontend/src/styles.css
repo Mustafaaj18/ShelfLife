@@ -186,42 +186,6 @@ nav button {
 }
 
 
-/* Main Navigation */
-
-nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  padding: 18px 24px;
-  background-color: #172b4d;
-}
-
-nav button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-nav button:hover {
-  color: #d4a84b;
-}
-
-@media (max-width: 600px) {
-  nav {
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  nav button {
-    font-size: 14px;
-  }
-}
-
-
 /* Book Management */
 
 .book-management {
@@ -321,5 +285,64 @@ nav button:hover {
 
   .book-management section {
     padding: 16px;
+  }
+}
+
+
+/* Shared Navigation */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 6%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #172b4d;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.site-nav button {
+  padding: 10px 14px;
+  background: transparent;
+  color: #172b4d;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.site-nav button:hover {
+  background-color: #f5f1e8;
+}
+
+@media (max-width: 650px) {
+  .site-header {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .site-nav {
+    justify-content: center;
+    gap: 4px;
   }
 }

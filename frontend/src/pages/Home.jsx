@@ -19,18 +19,6 @@ const features = [
 function Home() {
   return (
     <div className="page">
-      <header className="topbar">
-        <a className="brand" href="#home" aria-label="Shelf Life home">
-          <span className="brand-mark">S</span>
-          <span>Shelf Life</span>
-        </a>
-        <nav aria-label="Main navigation">
-          <a href="#features">Features</a>
-          <a href="#about">About</a>
-        </nav>
-        <a className="header-button" href="#features">Explore the system</a>
-      </header>
-
       <main id="home">
         <section className="hero">
           <div className="hero-copy">
