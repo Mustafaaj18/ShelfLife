@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+const connectDB = require("./config/db");
+
 const healthRoutes = require("./routes/healthRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 
@@ -18,6 +20,17 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Shelf Life API running on http://localhost:${PORT}`);
+
+async function startServer() {
+  await connectDB();
+  console.log("MongoDB connected");
+
+  app.listen(PORT, () => {
+    console.log(`Shelf Life API running on http://localhost:${PORT}`);
+  });
+}
+
+startServer().catch((error) => {
+  console.error("Unable to start Shelf Life API:", error.message);
+  process.exitCode = 1;
 });
