@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../middleware/auth");
 
 // Starter endpoint. The team will add book CRUD routes here.
-router.get("/", (req, res) => {
+router.get("/", protect, (req, res) => {
   res.json({
     success: true,
     message: "Book API is ready for development",
