@@ -1,9 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
 
-const healthRoutes = require("./routes/healthRoutes");
-const bookRoutes = require("./routes/bookRoutes");
+import healthRoutes from "./routes/healthRoutes.js";
+import bookRoutes from "./routes/bookRoutes.js";
 
 const app = express();
 
