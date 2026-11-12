@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 // Starter endpoint. The team will add book CRUD routes here.
@@ -10,4 +10,4 @@ router.get("/", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;
