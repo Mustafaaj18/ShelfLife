@@ -8,22 +8,45 @@ import Navbar from './components/Navbar'
 import BookManagement from './pages/BookManagement'
 
 function App() {
-  const userRole = null
   const [currentPage, setCurrentPage] = useState('home')
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = sessionStorage.getItem('user')
+      return storedUser ? JSON.parse(storedUser) : null
+    } catch {
+      return null
+    }
+  })
 
   function navigate(page) {
     setCurrentPage(page)
   }
 
+  function handleLogin(userData) {
+    setUser(userData)
+    setCurrentPage('dashboard')
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('user')
+    setUser(null)
+    setCurrentPage('home')
+  }
+
   return (
     <>
-      <Navbar onNavigate={navigate} />
+      <Navbar
+        onNavigate={navigate}
+        user={user}
+        onLogout={handleLogout}
+      />
 
       {currentPage === 'home' && <Home />}
-      {currentPage === 'dashboard' && <Dashboard role={userRole} />}
-      {currentPage === 'signup' && <SignUp />}
-      {currentPage === 'signin' && <SignIn />}
-      {currentPage === 'books' && <BookManagement role={userRole} />}
+      {currentPage === 'dashboard' && <Dashboard />}
+      {currentPage === 'signup' && <SignUp onLogin={handleLogin} />}
+      {currentPage === 'signin' && <SignIn onLogin={handleLogin} />}
+      {currentPage === 'books' && <BookManagement role={user?.role} />}
     </>
   )
 }

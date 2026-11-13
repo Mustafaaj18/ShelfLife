@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 
-function SignUp() {
+function SignUp({ onLogin }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,7 +21,7 @@ function SignUp() {
     })
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     setError('')
     setMessage('')
@@ -31,7 +31,34 @@ function SignUp() {
       return
     }
 
-    setMessage('Registration form completed. Account creation will be available when the backend is connected.')
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Registration failed.')
+        return
+      }
+
+      sessionStorage.setItem('token', data.token)
+      sessionStorage.setItem('user', JSON.stringify(data.user))
+      onLogin(data.user)
+
+      setMessage('Account created successfully!')
+    } catch {
+      setError('Unable to connect to the backend server.')
+    }
   }
 
   return (
@@ -67,6 +94,7 @@ function SignUp() {
           name="password"
           value={formData.password}
           onChange={handleChange}
+          minLength={8}
           required
         />
 
@@ -77,6 +105,7 @@ function SignUp() {
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
+          minLength={8}
           required
         />
 

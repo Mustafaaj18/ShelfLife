@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 
-function SignIn() {
+function SignIn({ onLogin }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,10 +18,34 @@ function SignIn() {
     })
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
+    setMessage('')
 
-    setMessage('Sign-in form completed. Authentication will be available when the backend is connected.')
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setMessage(data.message || 'Sign in failed.')
+        return
+      }
+
+      sessionStorage.setItem('token', data.token)
+      sessionStorage.setItem('user', JSON.stringify(data.user))
+      onLogin(data.user)
+
+      setMessage('Signed in successfully!')
+    } catch {
+      setMessage('Unable to connect to the backend server.')
+    }
   }
 
   return (

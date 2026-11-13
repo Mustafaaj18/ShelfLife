@@ -1,32 +1,5 @@
 
-import { useState } from 'react'
-
-const initialBooks = [
-  {
-    id: 1,
-    title: 'The Great Gatsby',
-    author: 'F. Scott Fitzgerald',
-    isbn: '9780743273565',
-    category: 'Fiction',
-    available: true
-  },
-  {
-    id: 2,
-    title: 'To Kill a Mockingbird',
-    author: 'Harper Lee',
-    isbn: '9780061120084',
-    category: 'Fiction',
-    available: false
-  },
-  {
-    id: 3,
-    title: '1984',
-    author: 'George Orwell',
-    isbn: '9780451524935',
-    category: 'Fiction',
-    available: true
-  }
-]
+import { useEffect, useState } from 'react'
 
 const emptyForm = {
   title: '',
@@ -37,17 +10,53 @@ const emptyForm = {
 }
 
 function BookManagement({ role }) {
-  const [books, setBooks] = useState(initialBooks)
+  const [books, setBooks] = useState([])
   const [search, setSearch] = useState('')
   const [formData, setFormData] = useState(emptyForm)
   const [editingId, setEditingId] = useState(null)
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(true)
 
   const isAdmin = role === 'admin'
+  const token = sessionStorage.getItem('token')
+
+  useEffect(() => {
+    async function loadBooks() {
+      if (!token) {
+        setMessage('Please sign in to view the book collection.')
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/books', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          setMessage(data.message || data.error || 'Unable to load books.')
+          return
+        }
+
+        setBooks(data)
+      } catch {
+        setMessage('Unable to connect to the backend server.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadBooks()
+  }, [token])
 
   const filteredBooks = books.filter((book) =>
-    [book.title, book.author, book.isbn, book.category]
+    [book.title, book.author, book.isbn, book.genre]
       .some((value) =>
-        value.toLowerCase().includes(search.toLowerCase())
+        (value || '').toLowerCase().includes(search.toLowerCase())
       )
   )
 
@@ -60,29 +69,60 @@ function BookManagement({ role }) {
     })
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
 
-    if (!isAdmin) return
+    if (!isAdmin || !token) return
 
-    if (editingId !== null) {
-      setBooks(books.map((book) =>
-        book.id === editingId
-          ? { ...formData, id: editingId }
-          : book
-      ))
-    } else {
-      setBooks([
-        ...books,
-        {
-          ...formData,
-          id: Date.now()
-        }
-      ])
+    setMessage('')
+
+    const bookData = {
+      title: formData.title,
+      author: formData.author,
+      isbn: formData.isbn,
+      genre: formData.category,
+      status: formData.available ? 'available' : 'borrowed'
     }
 
-    setFormData(emptyForm)
-    setEditingId(null)
+    const isEditing = editingId !== null
+
+    const url = isEditing
+      ? `http://localhost:5000/api/books/${editingId}`
+      : 'http://localhost:5000/api/books'
+
+    try {
+      const response = await fetch(url, {
+        method: isEditing ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(bookData)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setMessage(data.message || data.error || 'Unable to save book.')
+        return
+      }
+
+      if (isEditing) {
+        setBooks((currentBooks) =>
+          currentBooks.map((book) =>
+            book._id === editingId ? data : book
+          )
+        )
+      } else {
+        setBooks((currentBooks) => [...currentBooks, data])
+      }
+
+      setFormData(emptyForm)
+      setEditingId(null)
+      setMessage(isEditing ? 'Book updated successfully.' : 'Book added successfully.')
+    } catch {
+      setMessage('Unable to connect to the backend server.')
+    }
   }
 
   function handleEdit(book) {
@@ -91,22 +131,46 @@ function BookManagement({ role }) {
     setFormData({
       title: book.title,
       author: book.author,
-      isbn: book.isbn,
-      category: book.category,
-      available: book.available
+      isbn: book.isbn || '',
+      category: book.genre || '',
+      available: book.status === 'available'
     })
 
-    setEditingId(book.id)
+    setEditingId(book._id)
+    setMessage('')
   }
 
-  function handleDelete(id) {
-    if (!isAdmin) return
+  async function handleDelete(id) {
+    if (!isAdmin || !token) return
 
-    setBooks(books.filter((book) => book.id !== id))
+    setMessage('')
 
-    if (editingId === id) {
-      setEditingId(null)
-      setFormData(emptyForm)
+    try {
+      const response = await fetch(`http://localhost:5000/api/books/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        setMessage(data.message || data.error || 'Unable to delete book.')
+        return
+      }
+
+      setBooks((currentBooks) =>
+        currentBooks.filter((book) => book._id !== id)
+      )
+
+      if (editingId === id) {
+        setEditingId(null)
+        setFormData(emptyForm)
+      }
+
+      setMessage('Book deleted successfully.')
+    } catch {
+      setMessage('Unable to connect to the backend server.')
     }
   }
 
@@ -120,131 +184,145 @@ function BookManagement({ role }) {
       <h1>Book Management</h1>
       <p>Browse and search the Shelf Life book collection.</p>
 
-      <input
-        type="search"
-        placeholder="Search by title, author, ISBN, or category"
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-      />
+      {message && <p role="status">{message}</p>}
 
-      {isAdmin && (
-        <section>
-          <h2>{editingId !== null ? 'Edit Book' : 'Add Book'}</h2>
+      {!token ? (
+        <p>Sign in to access the book collection.</p>
+      ) : (
+        <>
+          <input
+            type="search"
+            placeholder="Search by title, author, ISBN, or category"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
 
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="book-title">Title</label>
-            <input
-              id="book-title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
+          {isAdmin && (
+            <section>
+              <h2>{editingId !== null ? 'Edit Book' : 'Add Book'}</h2>
 
-            <label htmlFor="book-author">Author</label>
-            <input
-              id="book-author"
-              name="author"
-              value={formData.author}
-              onChange={handleChange}
-              required
-            />
+              <form onSubmit={handleSubmit}>
+                <label htmlFor="book-title">Title</label>
+                <input
+                  id="book-title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                />
 
-            <label htmlFor="book-isbn">ISBN</label>
-            <input
-              id="book-isbn"
-              name="isbn"
-              value={formData.isbn}
-              onChange={handleChange}
-              required
-            />
+                <label htmlFor="book-author">Author</label>
+                <input
+                  id="book-author"
+                  name="author"
+                  value={formData.author}
+                  onChange={handleChange}
+                  required
+                />
 
-            <label htmlFor="book-category">Category</label>
-            <input
-              id="book-category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-            />
+                <label htmlFor="book-isbn">ISBN</label>
+                <input
+                  id="book-isbn"
+                  name="isbn"
+                  value={formData.isbn}
+                  onChange={handleChange}
+                  required
+                />
 
-            <label>
-              <input
-                type="checkbox"
-                name="available"
-                checked={formData.available}
-                onChange={handleChange}
-              />
-              Available
-            </label>
+                <label htmlFor="book-category">Category</label>
+                <input
+                  id="book-category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                />
 
-            <button type="submit">
-              {editingId !== null ? 'Save Changes' : 'Add Book'}
-            </button>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="available"
+                    checked={formData.available}
+                    onChange={handleChange}
+                  />
+                  Available
+                </label>
 
-            {editingId !== null && (
-              <button type="button" onClick={handleCancel}>
-                Cancel
-              </button>
-            )}
-          </form>
-        </section>
-      )}
+                <button type="submit">
+                  {editingId !== null ? 'Save Changes' : 'Add Book'}
+                </button>
 
-      <section>
-        <h2>Book Collection</h2>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>ISBN</th>
-              <th>Category</th>
-              <th>Availability</th>
-              {isAdmin && <th>Actions</th>}
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredBooks.map((book) => (
-              <tr key={book.id}>
-                <td>{book.title}</td>
-                <td>{book.author}</td>
-                <td>{book.isbn}</td>
-                <td>{book.category}</td>
-                <td>{book.available ? 'Available' : 'Borrowed'}</td>
-
-                {isAdmin && (
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => handleEdit(book)}
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(book.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                {editingId !== null && (
+                  <button type="button" onClick={handleCancel}>
+                    Cancel
+                  </button>
                 )}
-              </tr>
-            ))}
+              </form>
+            </section>
+          )}
 
-            {filteredBooks.length === 0 && (
-              <tr>
-                <td colSpan={isAdmin ? 6 : 5}>
-                  No books found.
-                </td>
-              </tr>
+          <section>
+            <h2>Book Collection</h2>
+
+            {loading ? (
+              <p>Loading books...</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Category</th>
+                    <th>Availability</th>
+                    {isAdmin && <th>Actions</th>}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredBooks.map((book) => (
+                    <tr key={book._id}>
+                      <td>{book.title}</td>
+                      <td>{book.author}</td>
+                      <td>{book.isbn}</td>
+                      <td>{book.genre}</td>
+                      <td>
+                        {book.status === 'available' ? 'Available' : 'Borrowed'}
+                      </td>
+
+                      {isAdmin && (
+                        <td>
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(book)}
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(book._id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+
+                  {filteredBooks.length === 0 && (
+                    <tr>
+                      <td colSpan={isAdmin ? 6 : 5}>
+                        No books found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             )}
-          </tbody>
-        </table>
-      </section>
+          </section>
+        </>
+      )}
     </main>
   )
 }

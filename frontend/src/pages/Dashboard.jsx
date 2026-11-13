@@ -1,19 +1,30 @@
 
-function Dashboard({ role }) {
+function Dashboard() {
+  const storedUser = sessionStorage.getItem('user')
+  let user = null
+
+  try {
+    user = storedUser ? JSON.parse(storedUser) : null
+  } catch {
+    user = null
+  }
+
+  const role = user?.role
   const isAdmin = role === 'admin'
+
   if (!role) {
-  return (
-    <main className="dashboard">
-      <h1>Library Dashboard</h1>
-      <p>Please sign in to access your dashboard.</p>
-    </main>
-  )
-}
+    return (
+      <main className="dashboard">
+        <h1>Library Dashboard</h1>
+        <p>Please sign in to access your dashboard.</p>
+      </main>
+    )
+  }
 
   return (
     <main className="dashboard">
       <h1>Library Dashboard</h1>
-      <p>Welcome to Shelf Life.</p>
+      <p>Welcome to Shelf Life, {user.name}.</p>
 
       <section>
         <h2>{isAdmin ? 'Administrator Dashboard' : 'Member Dashboard'}</h2>
