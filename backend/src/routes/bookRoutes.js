@@ -1,15 +1,20 @@
 import express from "express";
-import { protect } from "../middleware/auth.js";
+import bookCtrl from "../controllers/bookController.js";
+import { protect, authorize } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Starter endpoint. The team will add book CRUD routes here.
-router.get("/", protect, (req, res) => {
-  res.json({
-    success: true,
-    message: "Book API is ready for development",
-    data: []
-  });
-});
+router.use(protect);
+
+router.route("/")
+  .get(bookCtrl.list)
+  .post(authorize("admin"), bookCtrl.create);
+
+router.route("/:bookId")
+  .get(bookCtrl.read)
+  .put(authorize("admin"), bookCtrl.update)
+  .delete(authorize("admin"), bookCtrl.remove);
+
+router.param("bookId", bookCtrl.bookByID);
 
 export default router;
