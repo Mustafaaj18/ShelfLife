@@ -29,7 +29,7 @@ function Home() {
               find books, and keep track of borrowing activity.
             </p>
             <a className="primary-button" href="#features">Explore Shelf Life <span>→</span></a>
-            <p className="status-note"><span className="status-dot"></span> Student project · First release in development</p>
+            <p className="status-note"><span className="status-dot"></span> Student project · Library Management System</p>
           </div>
           <div className="hero-art" aria-label="Illustration of books on a shelf">
             <div className="sun"></div>
@@ -44,9 +44,9 @@ function Home() {
 
         <section className="features-section" id="features">
           <div className="section-heading">
-            <p className="eyebrow">WHAT WE'RE BUILDING</p>
+            <p className="eyebrow">OUR FEATURES</p>
             <h2>A more organized library</h2>
-            <p>Our first release will focus on the essential tools a library needs.</p>
+            <p>Explore the essential tools for managing a library.</p>
           </div>
           <div className="feature-grid">
             {features.map((feature) => (
@@ -66,9 +66,8 @@ function Home() {
           </div>
           <p>
             Shelf Life is being developed by a five-member student team.
-            The first release will include book management, user accounts,
-            and borrowing records. More features will be added as the team
-            completes and tests each part.
+            The system brings together book management, user accounts,
+            and library collection tools in one place.
           </p>
         </section>
       </main>

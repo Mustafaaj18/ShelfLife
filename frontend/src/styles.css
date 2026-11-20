@@ -346,3 +346,8 @@ nav button {
     gap: 4px;
   }
 }
+
+.site-nav button.active {
+  background-color: #f5f1e8;
+  color: #173b65;
+}
