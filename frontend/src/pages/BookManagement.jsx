@@ -186,9 +186,7 @@ function BookManagement({ role }) {
 
       {message && <p role="status">{message}</p>}
 
-      {!token ? (
-        <p>Sign in to access the book collection.</p>
-      ) : (
+      {!token ? null : (
         <>
           <input
             type="search"
