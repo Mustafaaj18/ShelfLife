@@ -29,7 +29,7 @@ function BookManagement({ role }) {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/books', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/books`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -87,8 +87,8 @@ function BookManagement({ role }) {
     const isEditing = editingId !== null
 
     const url = isEditing
-      ? `http://localhost:5000/api/books/${editingId}`
-      : 'http://localhost:5000/api/books'
+      ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/books/${editingId}`
+      : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/books`
 
     try {
       const response = await fetch(url, {
@@ -146,7 +146,7 @@ function BookManagement({ role }) {
     setMessage('')
 
     try {
-      const response = await fetch(`http://localhost:5000/api/books/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/books/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`
