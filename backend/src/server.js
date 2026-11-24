@@ -24,6 +24,16 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 
+// Catch-all error handler: never send stack traces or file paths to the user
+app.use((err, req, res, next) => {
+  console.error(err);
+  const status = err.status || 500;
+  res.status(status).json({
+    success: false,
+    message: status === 400 ? "Invalid request" : "Something went wrong",
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
