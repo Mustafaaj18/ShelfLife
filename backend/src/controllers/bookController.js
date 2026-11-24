@@ -1,11 +1,12 @@
 import Book from "../models/Book.js";
+import { safeError } from "../utils/errors.js";
 
 const create = async (req, res) => {
   try {
     const book = await new Book(req.body).save();
     return res.status(200).json(book);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
@@ -14,7 +15,7 @@ const list = async (req, res) => {
     const books = await Book.find();
     res.json(books);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
@@ -40,7 +41,7 @@ const update = async (req, res) => {
     await book.save();
     res.json(book);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
@@ -49,7 +50,7 @@ const remove = async (req, res) => {
     const deleted = await req.book.deleteOne();
     res.json(deleted);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
