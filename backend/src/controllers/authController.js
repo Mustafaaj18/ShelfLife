@@ -36,3 +36,24 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Login failed" });
   }
 };
+
+// GET /api/auth/me  (logged-in user reads own profile)
+export const me = (req, res) => {
+  const { name, email, role } = req.user;
+  res.json({ name, email, role });
+};
+
+// PUT /api/auth/me  (logged-in user edits own name/email, never role)
+export const updateMe = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    if (name) req.user.name = name;
+    if (email) req.user.email = email;
+    req.user.updated = Date.now();
+    await req.user.save();
+    res.json({ name: req.user.name, email: req.user.email, role: req.user.role });
+  } catch (err) {
+    if (err.code === 11000) return res.status(409).json({ message: "Email already registered" });
+    res.status(400).json({ message: "Could not update profile" });
+  }
+};
