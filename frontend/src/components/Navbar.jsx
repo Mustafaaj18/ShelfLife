@@ -1,5 +1,5 @@
 
-function Navbar({ onNavigate, user, onLogout }) {
+function Navbar({ onNavigate, currentPage, user, onLogout }) {
   return (
     <header className="site-header">
       <div className="site-brand" onClick={() => onNavigate('home')}>
@@ -8,13 +8,13 @@ function Navbar({ onNavigate, user, onLogout }) {
       </div>
 
       <nav className="site-nav" aria-label="Main navigation">
-        <button type="button" onClick={() => onNavigate('home')}>
+        <button type="button" className={currentPage === 'home' ? 'active' : ''} onClick={() => onNavigate('home')}>
           Home
         </button>
-        <button type="button" onClick={() => onNavigate('dashboard')}>
+        <button type="button" className={currentPage === 'dashboard' ? 'active' : ''} onClick={() => onNavigate('dashboard')}>
           Dashboard
         </button>
-        <button type="button" onClick={() => onNavigate('books')}>
+        <button type="button" className={currentPage === 'books' ? 'active' : ''} onClick={() => onNavigate('books')}>
           Books
         </button>
 
@@ -24,10 +24,18 @@ function Navbar({ onNavigate, user, onLogout }) {
           </button>
         ) : (
           <>
-            <button type="button" onClick={() => onNavigate('signup')}>
+            <button
+              type="button"
+              className={currentPage === 'signup' ? 'active' : ''}
+              onClick={() => onNavigate('signup')}
+            >
               Sign Up
             </button>
-            <button type="button" onClick={() => onNavigate('signin')}>
+            <button
+              type="button"
+              className={currentPage === 'signin' ? 'active' : ''}
+              onClick={() => onNavigate('signin')}
+            >
               Sign In
             </button>
           </>

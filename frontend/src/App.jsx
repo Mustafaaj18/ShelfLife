@@ -38,6 +38,7 @@ function App() {
     <>
       <Navbar
         onNavigate={navigate}
+        currentPage={currentPage}
         user={user}
         onLogout={handleLogout}
       />
