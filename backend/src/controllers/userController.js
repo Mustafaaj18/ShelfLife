@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import { safeError } from "../utils/errors.js";
 
 const create = async (req, res) => {
   try {
@@ -6,7 +7,7 @@ const create = async (req, res) => {
     user.password = undefined;
     return res.status(200).json(user);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
@@ -15,7 +16,7 @@ const list = async (req, res) => {
     const users = await User.find().select("name email created updated");
     res.json(users);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
@@ -43,7 +44,7 @@ const update = async (req, res) => {
     user.password = undefined;
     res.json(user);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
@@ -52,7 +53,7 @@ const remove = async (req, res) => {
     const deleted = await req.profile.deleteOne();
     res.json(deleted);
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: safeError(err) });
   }
 };
 
