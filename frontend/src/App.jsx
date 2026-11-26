@@ -44,7 +44,7 @@ function App() {
       />
 
       {currentPage === 'home' && <Home />}
-      {currentPage === 'dashboard' && <Dashboard />}
+      {currentPage === 'dashboard' && <Dashboard onNavigate={navigate} />}
       {currentPage === 'signup' && <SignUp onLogin={handleLogin} />}
       {currentPage === 'signin' && <SignIn onLogin={handleLogin} />}
       {currentPage === 'books' && <BookManagement role={user?.role} />}

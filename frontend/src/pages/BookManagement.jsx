@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 
 const emptyForm = {
@@ -16,6 +15,7 @@ function BookManagement({ role }) {
   const [editingId, setEditingId] = useState(null)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
+  const [borrowingId, setBorrowingId] = useState(null)
 
   const isAdmin = role === 'admin'
   const token = sessionStorage.getItem('token')
@@ -174,6 +174,44 @@ function BookManagement({ role }) {
     }
   }
 
+  async function handleBorrow(id) {
+    if (role !== 'member' || !token || borrowingId !== null) return
+
+    setMessage('')
+    setBorrowingId(id)
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/borrowings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ bookId: id })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setMessage(data.message || data.error || 'Unable to borrow book.')
+        return
+      }
+
+      setBooks((currentBooks) =>
+        currentBooks.map((book) =>
+          book._id === id
+            ? { ...book, status: 'borrowed' }
+            : book
+        )
+      )
+
+      setMessage('Book borrowed successfully.')
+    } catch {
+      setMessage('Unable to connect to the backend server.')
+    } finally {
+      setBorrowingId(null)
+    }
+  }
+
   function handleCancel() {
     setEditingId(null)
     setFormData(emptyForm)
@@ -273,7 +311,7 @@ function BookManagement({ role }) {
                     <th>ISBN</th>
                     <th>Category</th>
                     <th>Availability</th>
-                    {isAdmin && <th>Actions</th>}
+                    <th>Actions</th>
                   </tr>
                 </thead>
 
@@ -288,7 +326,7 @@ function BookManagement({ role }) {
                         {book.status === 'available' ? 'Available' : 'Borrowed'}
                       </td>
 
-                      {isAdmin && (
+                      {isAdmin ? (
                         <td>
                           <button
                             type="button"
@@ -304,13 +342,27 @@ function BookManagement({ role }) {
                             Delete
                           </button>
                         </td>
+                      ) : (
+                        <td>
+                          <button
+                            type="button"
+                            disabled={role !== 'member' || book.status !== 'available' || borrowingId !== null}
+                            onClick={() => handleBorrow(book._id)}
+                          >
+                            {borrowingId === book._id
+                              ? 'Borrowing...'
+                              : book.status === 'available'
+                                ? 'Borrow'
+                                : 'Unavailable'}
+                          </button>
+                        </td>
                       )}
                     </tr>
                   ))}
 
                   {filteredBooks.length === 0 && (
                     <tr>
-                      <td colSpan={isAdmin ? 6 : 5}>
+                      <td colSpan={6}>
                         No books found.
                       </td>
                     </tr>
