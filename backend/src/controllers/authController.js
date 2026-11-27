@@ -16,6 +16,7 @@ export const register = async (req, res) => {
     const user = await User.create({ name, email, password }); // role is always "member"
     sendToken(res, 201, user);
   } catch (err) {
+    console.error(err);
     if (err.code === 11000) return res.status(409).json({ message: "Email already registered" });
     res.status(400).json({ message: "Name, email and a password of 8+ characters are required" });
   }
