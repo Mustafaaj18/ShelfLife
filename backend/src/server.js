@@ -16,7 +16,7 @@ const app = express();
 
 app.set("trust proxy", 1); // lets the login limit see real visitor IPs on cloud hosts
 app.use(helmet());
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",") }));
 app.use(express.json());
 
 app.use("/api/health", healthRoutes);
