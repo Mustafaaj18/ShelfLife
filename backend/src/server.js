@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 
 import healthRoutes from "./routes/healthRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -8,10 +9,13 @@ import bookRoutes from "./routes/bookRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import connectDB from "./config/db.js";
 
-if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is missing from .env");
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)
+  throw new Error("JWT_SECRET is missing from .env or is shorter than 32 characters");
 
 const app = express();
 
+app.set("trust proxy", 1); // lets the login limit see real visitor IPs on cloud hosts
+app.use(helmet());
 app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",") }));
 app.use(express.json());
 
