@@ -12,7 +12,7 @@ if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is missing from .env");
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",") }));
 app.use(express.json());
 
 app.use("/api/health", healthRoutes);
