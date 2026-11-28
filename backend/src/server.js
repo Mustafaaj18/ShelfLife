@@ -6,6 +6,7 @@ import helmet from "helmet";
 import healthRoutes from "./routes/healthRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
+import borrowingRoutes from "./routes/borrowingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import connectDB from "./config/db.js";
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/borrowings", borrowingRoutes);
 app.use("/api/users", userRoutes);
 
 app.use((req, res) => {
